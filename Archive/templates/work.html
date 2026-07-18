@@ -1,0 +1,53 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="card shadow-sm card-soft">
+  <div class="card-body">
+    <h1 class="h5 mb-2">Work Generator</h1>
+    <p class="text-secondary mb-4">
+      Generate controlled CPU load for hybrid scaling experiments.
+    </p>
+
+    <div class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Work duration (ms)</label>
+        <input id="ms" class="form-control" type="number" value="800" min="1" max="10000">
+      </div>
+      <div class="col-md-4">
+        <button class="btn btn-primary w-100" onclick="runWork()">Run Work</button>
+      </div>
+      <div class="col-md-4">
+        <a class="btn btn-outline-secondary w-100" href="/metrics">View Metrics</a>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Repeat (times)</label>
+        <input id="repeat" class="form-control" type="number" value="1" min="1" max="200">
+      </div>
+    </div>
+
+    <hr class="my-4"/>
+
+    <div class="small text-secondary">Response</div>
+    <pre id="result" class="result-box">{ }</pre>
+  </div>
+</div>
+
+<script>
+    async function runWork() {
+      const ms = Number(document.getElementById("ms").value || 800);
+      const repeat = Number(document.getElementById("repeat").value || 1);
+    
+      const out = [];
+      for (let i = 0; i < repeat; i++) {
+        const t0 = performance.now();
+        const res = await fetch(`/work?ms=${ms}`);
+        const data = await res.json();
+        const t1 = performance.now();
+        out.push({ run: i+1, ...data, browser_roundtrip_ms: Number((t1 - t0).toFixed(2)) });
+      }
+    
+      document.getElementById("result").textContent = JSON.stringify(out, null, 2);
+    }
+    </script>
+
+{% endblock %}

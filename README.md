@@ -47,3 +47,84 @@ The application is deployed on AWS Elastic Beanstalk, which provides a managed p
 
 Once deployed, incoming user requests are routed to the Flask application running on the EC2 instance, where the application processes requests, collects runtime performance metrics, and calculates the Hybrid Scaling Metric. These custom metrics are then published to Amazon CloudWatch, enabling real-time monitoring and providing the foundation for future intelligent auto-scaling policies. By automating infrastructure provisioning, deployment, monitoring, and health management, Elastic Beanstalk allows developers to focus on application development while AWS manages the operational aspects of the cloud environment.
 
+# CPU Utilization Auto Scaling Experiment
+
+# Objective
+
+The objective of this experiment was to evaluate the default CPU-based auto scaling mechanism provided by AWS Elastic Beanstalk. The experiment aimed to determine whether an EC2 instance would automatically scale out when CPU utilization exceeded the configured threshold and scale back in once the workload returned to normal.
+
+# Auto Scaling Configuration
+
+The Elastic Beanstalk environment was configured with an Auto Scaling Group using CPU Utilization as the scaling metric. The environment initially launched with a single EC2 instance, while the minimum capacity was set to one instance and the maximum capacity was limited to two instances. A scale-out policy was configured to add one additional instance whenever the average CPU utilization exceeded 60%, while a scale-in policy removed the additional instance once CPU utilization remained below the configured threshold after the cooldown period. This configuration allowed the application to automatically adjust its compute resources according to workload demand while preventing unnecessary scaling actions caused by temporary CPU spikes.
+
+Scale-UP Policy             Scale-DOWN Policy
+Metric:                     Metric
+CPUUtilization              CPUUtilization       
+
+Condition:                  Condition:
+CPU > 60%                   CPU < 25%
+
+Evaluation:                 Evaluation:
+2 consecutive periods       2 consecutive periods
+(2 × 60 seconds)
+
+Action:                     Action:
++1 EC2 instance             -1 EC2 instance
+
+Cooldown:                   Cooldown:
+300 seconds                 300 seconds
+
+# Experimental Results
+
+The experiment demonstrated that the application initially operated on a single EC2 instance while CPU utilization remained below the configured threshold. As the generated workload increased, CPU utilization gradually rose above 60%, triggering the configured Auto Scaling policy. Elastic Beanstalk automatically launched a second EC2 instance, and the Auto Scaling Group updated the desired capacity from one to two instances without requiring manual intervention. This confirmed that the CPU-based scaling policy was functioning as expected.
+
+After the workload generation was stopped, CPU utilization decreased significantly. Following the configured cooldown period, the Auto Scaling Group automatically terminated the additional EC2 instance and returned the environment to its original single-instance state. This verified that both scale-out and scale-in operations were successfully performed based on CPU utilization.
+
+### CPU Utilization Before Load
+
+![normally running CPU before heavy workload](screenshots/cpu-before-load.jpeg)
+
+### CPU Utilization Exceeding 60%
+
+![CPU after the workload crossed threshold (CPU > 60%)](screenshots/cpu-above-threshold.jpeg)
+
+### Auto Scaling Triggered
+
+![launching new ec2 after autoscaling is triggered](screenshots/autoscaling-triggered.jpeg)
+
+### Second EC2 Instance Running
+
+![new ec2 starts running](screenshots/new-running-ec2.jpeg)
+
+### Desired Capacity Increased to 2
+
+![desired capacity now becomes 2](screenshots/new-desired-capacity-2.jpeg)
+
+### Scale-Up After Workload Completed
+
+![auto scale up completed](screenshots/scale-up.jpeg)
+
+### CPU Utilization Below 25%
+
+![CPU after the workload is below threshold (CPU < 25%)](screenshots/CPU-below-threshold.jpeg)
+
+### Auto Scaling Triggered
+
+![terminating new ec2 after autoscaling is triggered](screenshots/autoscaling-triggered-terminate.jpeg)
+
+### Scale-Down
+
+![auto scale down completed](screenshots/scale-down.jpeg)
+
+Observations
+
+The experiment produced several important observations:
+
+- CPU utilization increased steadily as concurrent requests were generated.
+- The configured threshold of 60% CPU utilization successfully triggered the scale-out event.
+- Elastic Beanstalk automatically provisioned a second EC2 instance.
+- The Auto Scaling Group updated the desired capacity from 1 to 2 instances.
+- CloudWatch metrics clearly reflected the increase in CPU utilization before the scaling event.
+- After the workload stopped, CPU utilization returned to normal.
+- The Auto Scaling Group automatically removed the additional EC2 instance after the cooldown period.
+- The experiment confirmed the successful operation of AWS’s default CPU-based Auto Scaling mechanism.

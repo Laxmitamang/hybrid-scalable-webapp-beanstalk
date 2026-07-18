@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="card shadow-sm card-soft">
+  <div class="card-body">
+    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div>
+        <h1 class="h5 mb-1">Live Metrics</h1>
+        <div class="text-secondary small">Auto-refreshes every 2 seconds</div>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary btn-sm" href="/api/metrics">API JSON</a>
+        <a class="btn btn-primary btn-sm" href="/">Back</a>
+      </div>
+    </div>
+
+    <hr class="my-3"/>
+
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="metric-box">
+          <div class="label">CPU</div>
+          <div id="cpu" class="value">{{ metrics.cpu_percent }}%</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-box">
+          <div class="label">Memory</div>
+          <div id="mem" class="value">{{ metrics.memory_percent }}%</div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="metric-box">
+          <div class="label">RAM Used</div>
+          <div id="ram" class="value">{{ metrics.memory_used_mb }} MB</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-4 small text-secondary">
+      These metrics come from the instance. On Elastic Beanstalk, they reflect the EC2 host running your app.
+    </div>
+  </div>
+</div>
+
+<script>
+async function refresh() {
+  const res = await fetch("/api/metrics");
+  const d = await res.json();
+  document.getElementById("cpu").textContent = `${d.cpu_percent}%`;
+  document.getElementById("mem").textContent = `${d.memory_percent}%`;
+  document.getElementById("ram").textContent = `${d.memory_used_mb} MB`;
+}
+setInterval(refresh, 2000);
+</script>
+
+{% endblock %}

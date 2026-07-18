@@ -1,0 +1,60 @@
+body { background: #0b1220; }
+.card-soft { background: #0f1a2b; border: 1px solid rgba(255,255,255,0.08); color: #e8eefc; }
+.text-secondary { color: rgba(232, 238, 252, 0.7) !important; }
+
+.metric-box {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px;
+}
+.metric-box .label { font-size: 12px; color: rgba(232,238,252,0.7); }
+.metric-box .value { font-size: 22px; font-weight: 700; margin-top: 4px; }
+
+.result-box{
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px;
+  padding: 10px;
+  color: #d7e3ff;
+  min-height: 90px;
+}
+
+.kpi {
+    border-radius: 18px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.10);
+  }
+  
+  .kpi-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom: 8px;
+  }
+  
+  .kpi-label{
+    font-size: 12px;
+    letter-spacing: 0.2px;
+    color: rgba(232,238,252,0.75);
+  }
+  
+  .kpi-value{
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  
+  .kpi-sub{
+    margin-top: 6px;
+    font-size: 12px;
+  }
+  
+  .badge-soft{
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: rgba(232,238,252,0.85);
+    font-weight: 600;
+  }
+
+  
