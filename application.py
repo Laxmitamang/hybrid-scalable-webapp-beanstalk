@@ -239,6 +239,13 @@ def publish_custom_metrics_once():
         {"Name": "InstanceId", "Value": metrics["instance_id"]},
     ]
 
+    environment_dimensions = [
+    {
+        "Name": "Environment",
+        "Value": CW_ENV_NAME,
+    }
+]
+
     # If no traffic yet, p95 is None -> export 0.0
     p95 = float(rolling["latency_p95_ms"] or 0.0)
 
@@ -249,6 +256,15 @@ def publish_custom_metrics_once():
         {"MetricName": "CPUPercent", "Dimensions": dims, "Value": float(metrics["cpu_percent"]), "Unit": "Percent"},
         {"MetricName": "MemoryPercent", "Dimensions": dims, "Value": float(metrics["memory_percent"]), "Unit": "Percent"},
     ]
+
+    metric_data.append(
+    {
+        "MetricName": "HybridScore",
+        "Dimensions": environment_dimensions,
+        "Value": float(hybrid["score"]),
+        "Unit": "None",
+    }
+)
 
     _get_cw_client().put_metric_data(
         Namespace=CW_NAMESPACE,
